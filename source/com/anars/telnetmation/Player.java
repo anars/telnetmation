@@ -1,5 +1,5 @@
 /**
- * Telnetmation - Telnet Based ASCII Animation Player
+ * Telnetmation - Telnet Based ASCII Animation Player Server
  * Copyright (c) 2014 Anar Software LLC. < http://anars.com >
  * 
  * This program is free software: you can redistribute it and/or modify it under 
@@ -30,7 +30,7 @@ import java.util.logging.Logger;
 /**
  * Player class.
  *
- * @author Anar Software LLC
+ * @author Kay Anar
  * @version 1.0
  *
  */
@@ -124,7 +124,7 @@ public class Player
     }
     catch (Throwable throwable)
     {
-      printError(throwable);
+      _logger.log(Level.WARNING, "", throwable);
     }
     finally
     {
@@ -134,37 +134,44 @@ public class Player
 
   private void closeAll()
   {
-    try
-    {
-      _bufferedReader.close();
-    }
-    catch (Exception exception)
-    {
-      printError(exception);
-    }
-    _bufferedReader = null;
-    try
-    {
-      _dataOutputStream.close();
-    }
-    catch (Exception exception)
-    {
-      printError(exception);
-    }
-    _dataOutputStream = null;
-    try
-    {
-      _socket.close();
-    }
-    catch (Exception exception)
-    {
-      printError(exception);
-    }
-    _socket = null;
-  }
-
-  private void printError(Throwable throwable)
-  {
-    _logger.log(Level.SEVERE, "", throwable);
+    if (_bufferedReader != null)
+      try
+      {
+        _bufferedReader.close();
+      }
+      catch (Exception exception)
+      {
+        _logger.log(Level.WARNING, "BufferedReader close", exception);
+      }
+      finally
+      {
+        _bufferedReader = null;
+      }
+    if (_dataOutputStream != null)
+      try
+      {
+        _dataOutputStream.close();
+      }
+      catch (Exception exception)
+      {
+        _logger.log(Level.WARNING, "DataOutputStream close", exception);
+      }
+      finally
+      {
+        _dataOutputStream = null;
+      }
+    if (_socket != null)
+      try
+      {
+        _socket.close();
+      }
+      catch (Exception exception)
+      {
+        _logger.log(Level.WARNING, "Socket close", exception);
+      }
+      finally
+      {
+        _socket = null;
+      }
   }
 }

@@ -1,5 +1,5 @@
 /**
- * Telnetmation - Telnet Based ASCII Animation Player
+ * Telnetmation - Telnet Based ASCII Animation Player Server
  * Copyright (c) 2014 Anar Software LLC. < http://anars.com >
  * 
  * This program is free software: you can redistribute it and/or modify it under 
@@ -24,13 +24,14 @@ import java.net.ServerSocket;
 
 import java.util.Calendar;
 
+import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
  * Main class.
  *
- * @author Anar Software LLC
+ * @author Kay Anar
  * @version 1.0
  *
  */
@@ -38,16 +39,18 @@ public class Main
 {
   private static Logger _logger = Logger.getLogger("com.anars.telnetmation");
 
-  public static void main(String[] args)
+  public Main(String[] args)
   {
     int listenPort = 0;
     InetAddress bindAddress = null;
     File filePath = null;
     boolean center = false;
+    Level loggerLevel = Level.ALL;
     for (int index = 0; index < args.length; index++)
     {
       String values[] = args[index].split("=");
-      if (values[0].startsWith("-port"))
+      values[0] = values[0].trim().toLowerCase();
+      if (values[0].equals("-port"))
       {
         try
         {
@@ -57,10 +60,11 @@ public class Main
         }
         catch (Exception exception)
         {
+          _logger.log(Level.SEVERE, "-port value", exception);
           errorExit("Invalid -port value", -2);
         }
       }
-      else if (values[0].startsWith("-address"))
+      else if (values[0].equals("-address"))
       {
         try
         {
@@ -68,10 +72,11 @@ public class Main
         }
         catch (Exception exception)
         {
+          _logger.log(Level.SEVERE, "-address value", exception);
           errorExit("Invalid -address value", -3);
         }
       }
-      else if (values[0].startsWith("-file"))
+      else if (values[0].equals("-file"))
       {
         try
         {
@@ -81,20 +86,46 @@ public class Main
         }
         catch (Exception exception)
         {
+          _logger.log(Level.SEVERE, "-file value", exception);
           errorExit("Invalid -file value", -5);
         }
       }
-      else if (values[0].startsWith("-center"))
+      else if (values[0].equals("-log"))
       {
-        values[1] = values[1].toLowerCase();
-        if (values[1].equals("true"))
-          center = true;
-        else if (values[1].equals("false"))
-          center = false;
-        else
-          errorExit("Invalid -center value", -6);
+        try
+        {
+          loggerLevel = Level.parse(values[1].trim().toUpperCase());
+        }
+        catch (Exception exception)
+        {
+          _logger.log(Level.SEVERE, "-log value", exception);
+          errorExit("Invalid -log value", -6);
+        }
+
       }
-      else if (values[0].startsWith("-help"))
+      else if (values[0].equals("-center"))
+      {
+        try
+        {
+          values[1] = values[1].trim().toLowerCase();
+          if (values[1].equals("true"))
+            center = true;
+          else if (values[1].equals("false"))
+            center = false;
+          else
+          {
+            _logger.log(Level.SEVERE, "-center value", values[1]);
+            errorExit("Invalid -center value", -7);
+          }
+        }
+        catch (Exception exception)
+        {
+          _logger.log(Level.SEVERE, "-center value", exception);
+          errorExit("Invalid -center value", -5);
+        }
+
+      }
+      else if (values[0].equals("-help"))
       {
         System.out.println("\nTelnetmation version 1.0\n" + //
           "Copyright (c) " + Calendar.getInstance().get(Calendar.YEAR) + " Anar Software LLC. < http://anars.com >\n\n" + //
@@ -114,14 +145,32 @@ public class Main
           "-address=[INET-ADDRESS]\n" + //
           "\tLocal IP address or hostname which telnetmation will only accept connection requests from. Default, any/all local addresses.\n" + //
           "\tE.g. -address=192.168.1.100\n\n" + //
+          "-log=[LEVEL]\n" + //
+          "\tSet the log level specifying which message levels will be logged/displayed\n" + //
+          "\tOptions are ALL,CONFIG,FINE,FINER,FINEST,INFO,OFF,SEVERE, and WARNING. Default is ALL.\n" + //
+          "\tE.g. -log=INFO\n\n" + //
           "-center=[TRUE-FALSE]\n" + //
           "\tCenters ASCII animation both horizontally and vertically on the terminal screen.\n" + //
           "\tE.g. -center=true\n");
         System.exit(0);
       }
       else
-        errorExit("Unknown parameter \"" + args[index] + "\"", -7);
+      {
+        _logger.log(Level.SEVERE, "Unknown parameter \"" + args[index] + "\"");
+        errorExit("Unknown parameter \"" + args[index] + "\"", -8);
+      }
     }
+
+    _logger.setLevel(loggerLevel);
+
+    Handler[] handlers = Logger.getLogger("").getHandlers();
+    for (int index = 0; index < handlers.length; index++)
+      handlers[index].setLevel(loggerLevel);
+
+    handlers = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME).getHandlers();
+    for (int index = 0; index < handlers.length; index++)
+      handlers[index].setLevel(loggerLevel);
+
     if (filePath == null)
       errorExit("-file parameter is missing", -8);
 
@@ -152,7 +201,12 @@ public class Main
     }
   }
 
-  private static void errorExit(String message, int errorCode)
+  public static void main(String[] args)
+  {
+    new Main(args);
+  }
+
+  private void errorExit(String message, int errorCode)
   {
     System.err.println(message + ". Please type -help for details.");
     System.exit(errorCode);
