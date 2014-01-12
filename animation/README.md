@@ -4,19 +4,19 @@ This folder stores sample Telnetmation ASCII animation files.
 
 #Format:
 
-Sample file content :
+	version:width:height:delay_multiplier
+	delay
+	...
+	ASCII
+	...
 
-    1.0:x:1:250
-    2
-    H
-    2
-    He
-    2
-    Hel
-    2
-    Hell
-    2
+Sample file content (minimum):
+
+    1.0:5:1:250
+    4
     Hello
+    
+This sample file displays "Hello" for a second.
 
 #Bug tracker
 
