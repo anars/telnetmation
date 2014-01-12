@@ -79,7 +79,8 @@ public class Player
       int topMargin = 0;
       String line;
       int lineCount = 0;
-      String output = VT100_INIT + VT100_HOME + VT100_CLEAR;
+      String output = "";
+      _dataOutputStream.writeBytes(VT100_INIT + VT100_CLEAR + VT100_HOME);
       while ((line = _bufferedReader.readLine()) != null)
       {
         if (delayMultiplier == 0)
@@ -109,18 +110,20 @@ public class Player
               output += "\n";
             else
             {
-              _dataOutputStream.writeBytes(output + VT100_HOME);
-              sleep(delayMultiplier * delay);
-              output = VT100_HOME + VT100_CLEAR;
+              _dataOutputStream.writeBytes(VT100_HOME + VT100_CLEAR);
               for (int index = 0; _center && index < topMargin; index++)
-                output += "\n";
+                _dataOutputStream.writeBytes("\n");
+              _dataOutputStream.writeBytes(output + VT100_HOME);
+              _dataOutputStream.flush();
+              sleep(delayMultiplier * delay);
+              output = "";
               delay = -1;
               lineCount = 0;
             }
           }
         }
       }
-      _dataOutputStream.writeBytes(VT100_HOME + VT100_CLEAR);
+      _dataOutputStream.writeBytes(VT100_CLEAR + VT100_HOME);
     }
     catch (Throwable throwable)
     {
