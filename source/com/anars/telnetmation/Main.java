@@ -133,7 +133,7 @@ public class Main
           "This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n" + //
           "See the GNU General Public License for more details at http://www.gnu.org/licenses\n\n" + //
           "USAGE:\n" + //
-          "\tjava -jar telnetmation.jar [PARAMETERS]...\n\n" + //
+          "\tjava -jar telnetmation.jar -file=... [-port=... | -address=... | -center=... | -log=...]\n\n" + //
           "MANDATORY PARAMETER:\n\n" + //
           "-file=[FILE-PATH]\n" + //
           "\tFull path to ascii animation file.\n" + //
