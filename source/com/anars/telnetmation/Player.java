@@ -103,6 +103,7 @@ public class Player
             delay = Integer.parseInt(line);
           else
           {
+            line = line.replaceAll("\\s+$", "");
             for (int index = 0; !line.equals("") && _center && index < leftMargin; index++)
               output += " ";
             output += line;
