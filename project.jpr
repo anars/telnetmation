@@ -20,6 +20,22 @@
    </hash>
    <hash n="oracle.jdeveloper.compiler.OjcConfiguration">
       <value n="internalEncoding" v="ASCII"/>
+      <list n="Javac.commandline.optionlist">
+         <string v="-g:none"/>
+         <string v="-Xlint:all"/>
+         <string v="-Xlint:-cast"/>
+         <string v="-Xlint:-classfile"/>
+         <string v="-Xlint:-dep-ann"/>
+         <string v="-Xlint:-empty"/>
+         <string v="-Xlint:-fallthrough"/>
+         <string v="-Xlint:-path"/>
+         <string v="-Xlint:-processing"/>
+         <string v="-Xlint:-rawtypes"/>
+         <string v="-Xlint:-serial"/>
+         <string v="-Xlint:-unchecked"/>
+      </list>
+      <value n="Javac.-g" v="false"/>
+      <value n="Javac.-g:none" v="true"/>
       <value n="target" v="1.2"/>
       <value n="webIANAEncoding" v="US-ASCII"/>
    </hash>
