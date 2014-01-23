@@ -38,15 +38,17 @@ public class Player
   extends Thread
 {
   private static final double VERSION = 1.0;
-  private static final String VT100_INIT = "\u001b[0m";
-  private static final String VT100_HOME = "\u001b[H";
-  private static final String VT100_CLEAR = "\u001b[J";
+  private static final String VT100_CLEAR_LINE = "\u001b[0K";
+  private static final String VT100_INITALIZE = "\u001b[0m";
+  private static final String VT100_CURSOR_HOME = "\u001b[H";
+  private static final String VT100_CLEAR_SCREEN = "\u001b[J";
   private static Logger _logger = Logger.getLogger("com.anars.telnetmation");
 
   private Socket _socket;
   private DataOutputStream _dataOutputStream;
   private BufferedReader _bufferedReader;
   private boolean _center;
+  private String _from = ""; ;
 
   Player(Socket socket, File file, boolean center)
     throws Exception
@@ -58,7 +60,8 @@ public class Player
     {
       _dataOutputStream = new DataOutputStream(socket.getOutputStream());
       _bufferedReader = new BufferedReader(new FileReader(file));
-      _logger.log(Level.FINE, "Connection from " + socket.getRemoteSocketAddress().toString());
+      _from = socket.getRemoteSocketAddress().toString();
+      _logger.log(Level.FINE, _from + " connected.");
     }
     catch (Exception exception)
     {
@@ -80,7 +83,7 @@ public class Player
       String line;
       int lineCount = 0;
       String output = "";
-      _dataOutputStream.writeBytes(VT100_INIT + VT100_CLEAR + VT100_HOME);
+      _dataOutputStream.writeBytes(VT100_INITALIZE + VT100_CLEAR_SCREEN + VT100_CURSOR_HOME);
       while ((line = _bufferedReader.readLine()) != null)
       {
         if (delayMultiplier == 0)
@@ -107,14 +110,15 @@ public class Player
             for (int index = 0; !line.equals("") && _center && index < leftMargin; index++)
               output += " ";
             output += line;
+            output += VT100_CLEAR_LINE;
             if (++lineCount < height)
               output += "\n";
             else
             {
-              _dataOutputStream.writeBytes(VT100_HOME + VT100_CLEAR);
+              _dataOutputStream.writeBytes(VT100_CURSOR_HOME);
               for (int index = 0; _center && index < topMargin; index++)
-                _dataOutputStream.writeBytes("\n");
-              _dataOutputStream.writeBytes(output + VT100_HOME);
+                _dataOutputStream.writeBytes(VT100_CLEAR_LINE + "\n");
+              _dataOutputStream.writeBytes(output + VT100_CURSOR_HOME);
               _dataOutputStream.flush();
               sleep(delayMultiplier * delay);
               output = "";
@@ -124,7 +128,12 @@ public class Player
           }
         }
       }
-      _dataOutputStream.writeBytes(VT100_CLEAR + VT100_HOME);
+      _dataOutputStream.writeBytes(VT100_CLEAR_SCREEN + VT100_CURSOR_HOME);
+      _logger.log(Level.FINE, _from + " disconnected.");
+    }
+    catch (java.net.SocketException socketException)
+    {
+      _logger.log(Level.FINE, _from + " terminated.");
     }
     catch (Throwable throwable)
     {
